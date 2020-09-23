@@ -4,7 +4,7 @@
   "description": "RestAPI for GiftShare",
   "main": "server.js",
   "scripts": {
-    "test": "nodemon server.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/GiftShare/GiftShareAPI/issues"
   },
-  "homepage": "https://github.com/GiftShare/GiftShareAPI#readme"
+  "homepage": "https://github.com/GiftShare/GiftShareAPI#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.6",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.4"
+  }
 }
