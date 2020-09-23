@@ -1,0 +1,22 @@
+{
+  "name": "giftshareapi",
+  "version": "1.0.0",
+  "description": "RestAPI for GiftShare",
+  "main": "server.js",
+  "scripts": {
+    "test": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GiftShare/GiftShareAPI.git"
+  },
+  "keywords": [
+    "giftshare"
+  ],
+  "author": "vjasieg, alekszych",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GiftShare/GiftShareAPI/issues"
+  },
+  "homepage": "https://github.com/GiftShare/GiftShareAPI#readme"
+}
