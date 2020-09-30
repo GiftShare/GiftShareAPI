@@ -5,8 +5,9 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 
 const loginRoute = require('./routes/login');
+const userRoute = require('./routes/user');
 
-mongoose.connect("", {
+mongoose.connect("mongodb+srv://giftshare:giftsharekox@giftshare.jxnsk.mongodb.net/giftshare?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, function(err) {
@@ -15,12 +16,12 @@ mongoose.connect("", {
     }else {
         console.log('connected to db');
     }
-
 });
 
 app.use(morgan('dev'));
 app.use(bodyparser.json());
 app.use('/login', loginRoute);
+app.use('/user', userRoute);
 
 app.use((req, res, next) => {
     res.json({
