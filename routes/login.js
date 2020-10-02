@@ -5,46 +5,7 @@ const codesModel = require("../models/UserCodes");
 const mongoose = require("mongoose");
 const app = require("../app");
 const bcrypt = require('bcrypt');
-const nodemailer = require("nodemailer");
-
-function sendVerificationEmail(target, username, code) {
-    let testAccount = nodemailer.createTestAccount();
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true, // true for 465, false for other ports
-
-    });
-    let info = transporter.sendMail({
-        from: '"Giftshare" <giftshare1@gmail.com>', // sender address
-        to: target + ', ' + target, // list of receivers
-        subject: "Zweryfikuj swoje konto na Giftshare! ✔", // Subject line
-        text: "Zweryfikuj swoje konto na Giftshare! ✔", // plain text body
-        html: "<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "    <style>\n" +
-            "        .main {\n" +
-            "            width: 201px;\n" +
-            "            height: 251px;\n" +
-            "            margin: 0 auto;\n" +
-            "        }\n" +
-            "        .logo {\n" +
-            "            width: 200px;\n" +
-            "            height: 200px;\n" +
-            "        }\n" +
-            "    </style>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "    <div class=\"main\">\n" +
-            "        <h1 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center;\">Zweryfikuj swoje konto na Giftshare!</h1>\n" +
-            "        <img class=\"logo\" src=\"https://raw.githubusercontent.com/vjasieg/GiftShare/master/Logo.png\"/>\n" +
-            "    </div>\n" +
-            "    <h2 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center; margin-top: 120px;\">Hej, " + username + "! Twój kod weryfikacji to: " + code + "</h2>\n" +
-            "</body>\n" +
-            "</html>", // html body
-    });
-}
+const mail = require("../util/MailUtils");
 
 function isUsernameValid(v) {
     var re = /^[a-zA-Z0-9]+(?:[_ -]?[a-zA-Z0-9])*$/;
@@ -88,7 +49,7 @@ router.post('/register', (req, res, next) => {
                                                 password: hash
                                             })
                                             if (mongoose)
-                                            sendVerificationEmail(req.body.email, req.body.username, code);
+                                            typeof mail.sendVerificationEmail(req.body.email, req.body.username, code);
                                             const userCode = new codesModel({
                                                 email: req.body.email,
                                                 code: code
@@ -121,15 +82,24 @@ router.post('/verifyaccount/:email/:code', (req, res, next) => {
             userModel.findOne({email: new RegExp('^'+req.params.email+'$', "i")}).exec().then(userc => {
                 userc.verified = true;
                 userc.save();
+                res.status(200).json({
+                    "result": "Potwierdzono adres email."
+                });
+                user.delete();
+                typeof mail.sendEndingMail(req.params.email);
             }).catch(err => {
-
+                res.status(500).json({
+                    "error": err
+                });
             });
         }else {
-            console.log('nie');
+            res.status(500).json({
+                "result": "Zły kod."
+            });
         }
     }).catch(err => {
         res.status(500).json({
-            "error": err
+            "error": "Zły adres email."
         });
     });
 });
