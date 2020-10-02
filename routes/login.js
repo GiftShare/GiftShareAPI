@@ -13,15 +13,13 @@ function sendVerificationEmail(target, username, code) {
         host: "smtp.gmail.com",
         port: 465,
         secure: true, // true for 465, false for other ports
-        auth: {
 
-        },
     });
     let info = transporter.sendMail({
         from: '"Giftshare" <giftshare1@gmail.com>', // sender address
         to: target + ', ' + target, // list of receivers
-        subject: "Verify your Giftshare account! ✔", // Subject line
-        text: "Verify your Giftshare account! ✔", // plain text body
+        subject: "Zweryfikuj swoje konto na Giftshare! ✔", // Subject line
+        text: "Zweryfikuj swoje konto na Giftshare! ✔", // plain text body
         html: "<!DOCTYPE html>\n" +
             "<html>\n" +
             "<head>\n" +
@@ -39,10 +37,10 @@ function sendVerificationEmail(target, username, code) {
             "</head>\n" +
             "<body>\n" +
             "    <div class=\"main\">\n" +
-            "        <h1 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center;\">Verify your Giftshare account!</h1>\n" +
+            "        <h1 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center;\">Zweryfikuj swoje konto na Giftshare!</h1>\n" +
             "        <img class=\"logo\" src=\"https://raw.githubusercontent.com/vjasieg/GiftShare/master/Logo.png\"/>\n" +
             "    </div>\n" +
-            "    <h2 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center; margin-top: 120px;\">Hi, " + username + "! Your verification code is: " + code + "</h2>\n" +
+            "    <h2 style=\"font-family: 'Microsoft JhengHei Light'; text-align: center; margin-top: 120px;\">Hej, " + username + "! Twój kod weryfikacji to: " + code + "</h2>\n" +
             "</body>\n" +
             "</html>", // html body
     });
@@ -115,6 +113,25 @@ router.post('/register', (req, res, next) => {
                     .catch()
             }
         });
+});
+
+router.post('/verifyaccount/:email/:code', (req, res, next) => {
+    codesModel.findOne({email: new RegExp('^'+req.params.email+'$', "i")}).exec().then(user => {
+        if(req.params.code == user.code) {
+            userModel.findOne({email: new RegExp('^'+req.params.email+'$', "i")}).exec().then(userc => {
+                userc.verified = true;
+                userc.save();
+            }).catch(err => {
+
+            });
+        }else {
+            console.log('nie');
+        }
+    }).catch(err => {
+        res.status(500).json({
+            "error": err
+        });
+    });
 });
 
 module.exports = router;
