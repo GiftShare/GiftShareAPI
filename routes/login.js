@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const app = require("../app");
 const bcrypt = require('bcrypt');
 const mail = require("../util/MailUtils");
+const jwt = require("jsonwebtoken");
 
 function isUsernameValid(v) {
     var re = /^[a-zA-Z0-9]+(?:[_ -]?[a-zA-Z0-9])*$/;
@@ -102,6 +103,46 @@ router.post('/verifyaccount/:email/:code', (req, res, next) => {
             "error": "Zły adres email."
         });
     });
+});
+
+router.post('/signin', (req, res, next) => {
+    userModel.find({email: req.body.email}).exec().then(user => {
+        if(user.length < 1) {
+            return res.status(409).json({
+                "result": "Użytkownik nie istnieje."
+            });
+        }else {
+            bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+               if(err) {
+                   return res.status(500).json({
+                       "result": "Błąd logowania."
+                   });
+               }
+               if(result) {
+                   if(user[0].verified == true) {
+                       const token = jwt.sign({
+                           "userID": user[0]._id,
+                           "username": user[0].username,
+                           "email": req.body.email,
+                           "karma": user[0].karma
+                       },"secret2137", {expiresIn: "2h"});
+                       return res.status(200).json({
+                           "result": "Zalogowano.",
+                           "token": token
+                       });
+                   }else {
+                       return res.status(200).json({
+                           "result": "Twoje konto nie zostało zweryfikowane."
+                       });
+                   }
+               }else {
+                   return res.status(409).json({
+                       "result": "Złe hasło."
+                   });
+               }
+            });
+        }
+    }).catch();
 });
 
 module.exports = router;

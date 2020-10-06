@@ -2,16 +2,19 @@ const nodemailer = require("nodemailer");
 
 let testAccount = nodemailer.createTestAccount();
 let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "mail.privateemail.com",
     port: 465,
     secure: true, // true for 465, false for other ports
-
+    auth: {
+        user: "admin@giftshare.xyz", // generated ethereal user
+        pass: "", // generated ethereal password
+    },
 });
 
 module.exports = {
     sendVerificationEmail: function (target, username, code) {
         let info = transporter.sendMail({
-            from: '"Giftshare" <giftshare1@gmail.com>', // sender address
+            from: '"GiftShare" <admin@giftshare.xyz>', // sender address
             to: target + ', ' + target, // list of receivers
             subject: "Zweryfikuj swoje konto na Giftshare! ✔", // Subject line
             text: "Zweryfikuj swoje konto na Giftshare! ✔", // plain text body
@@ -42,7 +45,7 @@ module.exports = {
     },
     sendEndingMail: async function(target) {
         let info2 = transporter.sendMail({
-            from: '"Giftshare" <giftshare1@gmail.com>', // sender address
+            from: '"GiftShare" <admin@giftshare.xyz', // sender address
             to: target + ', ' + target, // list of receivers
             subject: "Dziękujemy za rejestracje! ❤", // Subject line
             text: "Dziękujemy za rejestracje! ❤", // plain text body
