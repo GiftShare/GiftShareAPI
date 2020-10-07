@@ -64,7 +64,7 @@ router.post('/delete/:postID', checkAuth, (req, res, next) => {
             });
         }else if(author.role === "Administrator") {
             post.delete();
-            return res.status(403).json({
+            return res.status(200).json({
                 "result": "Usunięto post."
             });
         }else {
@@ -77,5 +77,53 @@ router.post('/delete/:postID', checkAuth, (req, res, next) => {
     })
 });
 
+router.post('/edit/:postID', checkAuth, (req, res, next) => {
+    postModel.findById({"_id": req.params.postID}).exec().then(post => {
+        const author = token.getAttribute(req.body.token);
+        if(post.author === author.username) {
+            post.content = req.body.content;
+            post.save();
+            return res.status(200).json({
+                "result": "Zedytowano post."
+            });
+        }else if(author.role === "Administrator") {
+            post.content = req.body.content;
+            post.save();
+            return res.status(200).json({
+                "result": "Zedytowano post."
+            });
+        }else {
+            return res.status(403).json({
+                "result": "Nie masz uprawnień."
+            });
+        }
+    }).catch(err => {
+        console.log(err);
+    })
+});
+
+router.post('/upvote/:postID', checkAuth, (req, res, next) => {
+    postModel.findById({"_id": req.params.postID}).exec().then(post => {
+        const author = token.getAttribute(req.body.token);
+        post.upvoters.push(author.username);
+        post.upvotes = post.upvotes + 1;
+        post.save();
+        return res.status(200).json({
+            "result": "Upvote dodany"
+        });
+    }).catch();
+});
+
+router.post('/downvote/:postID', checkAuth, (req, res, next) => {
+    postModel.findById({"_id": req.params.postID}).exec().then(post => {
+        const author = token.getAttribute(req.body.token);
+        post.push(author.username);
+        post.upvotes = post.upvotes + 1;
+        post.save();
+        return res.status(200).json({
+            "result": "Upvote dodany"
+        });
+    }).catch();
+});
 
 module.exports = router;

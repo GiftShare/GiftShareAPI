@@ -115,7 +115,7 @@ router.post('/signin', (req, res, next) => {
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
                if(err) {
                    return res.status(500).json({
-                       "result": "Błąd logowania."
+                       "result": "Błąd logowania: " + err
                    });
                }
                if(result) {

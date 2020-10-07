@@ -6,6 +6,8 @@ const postSchema = mongoose.Schema({
     upvotes: {type: Number, default: 1},
     downvotes: {type: Number, default: 1},
     content: {type: String, required: true},
+    upvoters: {type: [String]},
+    downvoters: {type: [String]}
 });
 
 module.exports = mongoose.model('Post', postSchema);
