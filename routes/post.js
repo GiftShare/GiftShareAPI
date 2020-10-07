@@ -5,16 +5,14 @@ const mongoose = require("mongoose");
 const checkAuth = require("../util/checkauth");
 const jwt = require("jsonwebtoken");
 const categories = ["kategoria", "kategoria1"]
+const token = require('../util/token');
+
 function checkCategory(cat) {
     return categories.includes(cat);
 }
 
 router.post('/create', checkAuth, (req, res, next) => {
     const author = jwt.decode(req.body.token, "secret2137");
-    // console.log(author.userID);
-    // console.log(author.username);
-    // console.log(author.email);
-    // console.log(author.karma);
     const post = new postModel({
         "author": author.username,
         "category": req.body.category,
@@ -39,8 +37,8 @@ router.post('/create', checkAuth, (req, res, next) => {
     }
 });
 
-router.get('/get', checkAuth, (req, res, next) => {
-    postModel.findById({"_id": req.body.id}).exec().then(post => {
+router.get('/get/:postID', checkAuth, (req, res, next) => {
+    postModel.findById({"_id": req.params.postID}).exec().then(post => {
         res.status(200).json({
             "author": post.author,
             "content": post.content,
@@ -55,5 +53,29 @@ router.get('/get', checkAuth, (req, res, next) => {
         }
     });
 });
+
+router.post('/delete/:postID', checkAuth, (req, res, next) => {
+    postModel.findById({"_id": req.params.postID}).exec().then(post => {
+        const author = token.getAttribute(req.body.token);
+        if(post.author === author.username) {
+            post.delete();
+            return res.status(200).json({
+                "result": "Usunięto post."
+            });
+        }else if(author.role === "Administrator") {
+            post.delete();
+            return res.status(403).json({
+                "result": "Usunięto post."
+            });
+        }else {
+            return res.status(403).json({
+                "result": "Nie masz uprawnień."
+            });
+        }
+    }).catch(err => {
+        console.log(err);
+    })
+});
+
 
 module.exports = router;

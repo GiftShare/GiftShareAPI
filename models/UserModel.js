@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
     username: {type: String, required: true, createIndexes: true},
+    role: {type: String, default: "default"},
     verified: {type: Boolean, default: false},
     email: {
         type: String, required: true, createIndexes: true

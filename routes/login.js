@@ -123,6 +123,7 @@ router.post('/signin', (req, res, next) => {
                        const token = jwt.sign({
                            "userID": user[0]._id,
                            "username": user[0].username,
+                           "role": user[0].role,
                            "email": req.body.email,
                            "karma": user[0].karma
                        },"secret2137", {expiresIn: "2h"});
